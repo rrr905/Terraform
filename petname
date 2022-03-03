@@ -1,0 +1,23 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "random_pet" "server" {
+  length = 4
+}
+
+module ec2 {
+  source = "./ec2_instance"
+  name = "${random_pet.server.id}"
+}
+provisioner "file" {
+  source      = "${path.module}/files/script.sh"
+  destination = "/tmp/script.sh"
+
+  connection {
+    type     = "ssh"
+    user     = "root"
+    password = "${var.root_password}"
+    host     = "${var.host}"
+  }
+}
